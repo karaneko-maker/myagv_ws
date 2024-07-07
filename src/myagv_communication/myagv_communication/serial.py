@@ -1,3 +1,4 @@
+
 # シリアル通信を改善したバージョンno.2
 import rclpy
 from rclpy.node import Node
@@ -19,7 +20,7 @@ class SerialSubscriber(Node):
         self.serial_thread.start()
 
         self.wheel_radius = 0.0635 # 車輪の半径 [m]
-        self.wheel_base = 0.35 # 車輪間の距離 [m]
+        self.wheel_base = 0.33 # 車輪間の距離 [m]
         self.wheel_right_vel = 0.0
         self.wheel_left_vel = 0.0
 
@@ -31,6 +32,7 @@ class SerialSubscriber(Node):
                 send_data = a + ',' + b + '\n'
                 with self.serial_lock:
                     self.fd.flushInput()  # バッファをクリア
+                    # print(send_data)
                     self.fd.write(send_data.encode())
                     self.fd.flushOutput()  # バッファをクリア
             except serial.SerialException as e:
@@ -40,7 +42,7 @@ class SerialSubscriber(Node):
 
     def open_serial(self):
         try:
-            fd = serial.Serial('/dev/ttyACM0', 9600, write_timeout=1, timeout=1)
+            fd = serial.Serial('/dev/ttyACM0', 9600, write_timeout=0.05, timeout=0.05)
             self.get_logger().info(f"Serial port opened successfully: {fd}")
             return fd
         except Exception as e:
@@ -60,7 +62,7 @@ class SerialSubscriber(Node):
                     self.get_logger().error(f"Serial read error: {e}")
             else:
                 self.get_logger().warn("Serial port not available or not open.")
-            time.sleep(0.1)
+            time.sleep(0.03)
 
     def process_serial_data(self, data):
         try:
@@ -68,9 +70,14 @@ class SerialSubscriber(Node):
             if len(num_values) >= 2:
                 self.wheel_left_vel = 2 * 3.14 * self.wheel_radius * num_values[0] / 60
                 self.wheel_right_vel = 2 * 3.14 * self.wheel_radius * num_values[1] / 60
+                print("********************************")
+                print(f"wheel_left :{self.wheel_left_vel}")
+                print(f"wheel_right :{self.wheel_right_vel}")
                 twist_msg = Twist()
                 twist_msg.linear.x = (self.wheel_right_vel + self.wheel_left_vel) / 2
                 twist_msg.angular.z = (self.wheel_right_vel - self.wheel_left_vel) / self.wheel_base
+                print(f"linear_x")
+                print("********************************")
                 self.publisher.publish(twist_msg)
                 # self.get_logger().info("Velocity: Linear=%f" % (twist_msg.linear.x))
                 # self.get_logger().info("Velocity: Angular=%f" % (twist_msg.angular.z))
