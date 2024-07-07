@@ -14,14 +14,17 @@ setup(
     ],
     install_requires=['setuptools'],
     zip_safe=True,
-    maintainer='agv1',
-    maintainer_email='agv1@todo.todo',
+    maintainer='agv2',
+    maintainer_email='agv2@todo.todo',
     description='TODO: Package description',
     license='TODO: License declaration',
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            "serial = agv1_navigation.serial:main",
+            "serial = myagv_communication.serial:main",
+            'pd_control_node = myagv_communication.pd_control_node:main',
+            "diff_drive_controller_node = myagv_communication.diff_drive_controller:main",
+            "move_control_node = myagv_communication.move_control_node:main",
         ],
     },
 )
