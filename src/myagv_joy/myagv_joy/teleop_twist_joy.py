@@ -14,8 +14,8 @@ class TeleopTwistJoy(Node):
         self.vel = Twist()
 
     def listener_callback(self, Joy):
-        self.vel.linear.x = 0.4*Joy.axes[1]   #0.32 0.2
-        self.vel.angular.z = -0.74*1.9*Joy.axes[3]  #-1.5 1.0 
+        self.vel.linear.x = 0.2*Joy.axes[1]   #0.32 0.2 0.4
+        self.vel.angular.z = 0.4*Joy.axes[3]  #-1.5 1.0 
         self.publisher.publish(self.vel)
         self.get_logger().info("Velocity: Linear=%f" % (self.vel.linear.x))
         self.get_logger().info("Velocity: Angular=%f" % (self.vel.angular.z))
